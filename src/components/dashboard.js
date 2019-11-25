@@ -5,11 +5,13 @@ import { connect } from "react-redux";
 import logo from "./../logo.svg";
 import * as actionCreator from "../store/actions/actions";
 import Input from "./helper/input";
-import Circle from "./helper/circle"
+import Circle from "./helper/statusCircle/StatusCircle";
+
 
 class Dashboard extends Component {
 
 	state = {
+		open: false,
 		data: { name: "" },
 		dataList: "",
 		submitted: false,
@@ -25,8 +27,8 @@ class Dashboard extends Component {
 			{ id: 10, name: "Kamino" },
 			{ id: 11, name: "Geonosis" },
 		]
-
 	};
+
 	getIdFromName = (name) => {
 		const data = this.state.planets.filter((data) => data.name === name);
 		return data[0].id;
@@ -34,7 +36,6 @@ class Dashboard extends Component {
 
 	handleChange = ({ currentTarget: input }) => {
 		const data = { ...this.state.data };
-		//console.log("PLANET NAME", this.state.planets[input.value]);
 		data[input.name] = input.value;
 
 		this.setState({ data });
@@ -47,39 +48,36 @@ class Dashboard extends Component {
 		const searchParam = this.getIdFromName(this.state.data.name);
 
 		if (searchParam) {
+			this.props.loadingTest(true)
 			this.props.loadData(searchParam);
 		}
 	}
 
 
 	dataList = () => {
-
-		console.log("RESULT DATA :: :: ", this.props.reportData)
-		const data = this.props.reportData &&
+		console.log("This report data loading", this.props.loading)
+		return this.props.reportData ?
 			(<div className="col-sm-4" >
 				<div>
 					<div>
-						<Circle><p><strong>Created Date And Time: </strong>{new Date(this.props.reportData.created * 1000).toDateString()} </p>
-							<p><strong>Main: </strong> {this.props.reportData.name}</p>
-							<p><strong>Description: </strong>  {this.props.reportData.population} </p></Circle>
-
+						<Circle
+							backgroundColor="#444"
+							foregroundColor="#000"
+							height={`${this.props.reportData.population.length * 50}px`}
+							width={`${this.props.reportData.population.length * 50}px`}
+							payload={this.props.reportData}
+						/>
 					</div>
-
 				</div>
-
 			</div>
-
-			);
-
-
-
-		return data;
+			) : "";
 
 	}
 
 
 
 	render() {
+
 		const { submitted } = this.state;
 		if (!auth.getJwt()) {
 			window.location = "/login";
@@ -101,7 +99,6 @@ class Dashboard extends Component {
 				</div>
 				<div className="container">
 
-
 					<h1 style={{ marginLeft: '35%' }}>Planet Information</h1>
 					<hr />
 					<form onSubmit={this.handleSubmit}>
@@ -114,7 +111,6 @@ class Dashboard extends Component {
 										name="name"
 										type="text"
 										className="form-control"
-
 										placeHolder="Name"
 									/>
 								</div>
@@ -141,6 +137,7 @@ class Dashboard extends Component {
 					</form>
 
 					<div className="row">
+						<div className="ml-4 text-success" >&nbsp; &nbsp;{this.props.loading ? (<strong>Loading.... Please wait.</strong>) : ""}</div>
 						{(this.props.reportData === 'Error' || this.props.reportData === undefined) ? "" :
 							this.dataList()
 						}
@@ -160,7 +157,8 @@ const mapStateToProps = state => {
 };
 
 const actionCreators = {
-	loadData: actionCreator.loadData
+	loadData: actionCreator.loadData,
+	loadingTest: actionCreator.loading
 };
 
 

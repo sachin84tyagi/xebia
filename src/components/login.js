@@ -116,7 +116,6 @@ class Login extends Component {
               errorMessage={this.state.errors.password}
               placeHolder="Password"
             />
-            <div style={{ color: "#777", marginBottom: "10px" }}>Username: adminUser, Password: 12345678</div>
 
             <button type="submit" className="btn btn-secondary btn-width">
               LOGIN
